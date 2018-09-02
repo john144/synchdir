@@ -1,0 +1,26 @@
+HKCR
+{
+	Foo.CMyObject.1 = s 'CMyObject Class'
+	{
+		CLSID = s '{8FE3894C-8516-4534-9A99-0CF6EA4200FB}'
+	}
+	Foo.CMyObject = s 'CMyObject Class'
+	{
+		CLSID = s '{8FE3894C-8516-4534-9A99-0CF6EA4200FB}'
+		CurVer = s 'Foo.CMyObject.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8FE3894C-8516-4534-9A99-0CF6EA4200FB} = s 'CMyObject Class'
+		{
+			ProgID = s 'Foo.CMyObject.1'
+			VersionIndependentProgID = s 'Foo.CMyObject'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{D236B5A8-05F9-44F8-A38C-06939927C300}'
+		}
+	}
+}

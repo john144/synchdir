@@ -1,0 +1,5 @@
+*.sublime-workspace
+*.sublime-project
+__pycache__/
+Test_Private/
+Misc/
