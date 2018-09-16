@@ -47,8 +47,8 @@ class Synch:
         self.msg_queue = msg_queue
 
     def copy(self, relpath, filename, msg):
-        srcpath = os.path.join(self.src, relpath, filename)
-        dstpath = os.path.join(self.dst, relpath, filename)
+        srcpath = os.path.normpath(os.path.join(self.src, relpath, filename))
+        dstpath = os.path.normpath(os.path.join(self.dst, relpath, filename))
         dest_folder = os.path.dirname(dstpath)
 
         self.msg_queue.put((msg, f"{srcpath} to {dstpath}"))
@@ -73,9 +73,9 @@ class Synch:
             self.msg_queue.put(('PermissionError', e))
             
         # If was hidden file
-        #if was_hidden == True:
-            #self.hide_file(srcpath)
-            #self.hide_file(dstpath)
+        if was_hidden == True:
+            self.hide_file(srcpath)
+            self.hide_file(dstpath)
 
     def copy_over(self, relpath, filename):
         self.copy(relpath, filename, 'COPYOVER')
@@ -125,31 +125,14 @@ class Synch:
     def hide_file(self, filepath):
         if os.path.exists(filepath):
             self.msg_queue.put(('HIDE', filepath))
-            hide_cmd = f'attrib +h {filepath}'
-            check_output(hide_cmd, shell = True)
+            hide_cmd = f'attrib +H "{filepath}"'
+            print(check_output(hide_cmd, shell = True).decode())
     
     def show_file(self, filepath):
         if os.path.exists(filepath):
             self.msg_queue.put(('SHOW', filepath))
-            show_cmd = f'attrib -h {filepath}'
-            check_output(show_cmd, shell = True)
-    
-"""
-file_name = 'D:\\Backup\\e\\news\\descript.ion'
-
-dir_cmd = f'dir /b {file_name}'
-    
-dir_result = check_output(dir_cmd, shell = True).decode()
-print('dir', dir_result)
-
-try:
-    dir_result = check_output(dir_cmd, shell = True).decode()
-    print('dir\n', dir_result)
-except CalledProcessError as e:
-    pass
-
-"""
-            
+            show_cmd = f'attrib -H "{filepath}"'
+            print(check_output(show_cmd, shell = True).decode())
 
 
 def convert_size(size_bytes):
@@ -271,10 +254,7 @@ class PrintHandlerThread(threading.Thread):
         while not self._stop_event.is_set():
             try:
                 record = self.msg_queue.get(True, 0.05)
-                if record[0] == 'DONE':
-                    sg.Popup(record)
-                else:
-                    sg.Print(record)
+                print(record)
             except queue.Empty:
                 continue
 
@@ -300,8 +280,6 @@ def main(argv, defaultSrc, defaultDst):
     msg_queue.put(('INFO', "Destination directory:", dstdir))
 
     synchdir(msg_queue, srcdir, dstdir)
-    msg_queue.put(('DONE - Autoclose in 15 sec.'))
-    time.sleep(15)
     printhandler.join()
 
 
