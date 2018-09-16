@@ -1,5 +1,8 @@
+**/descript.ion
 *.sublime-workspace
 *.sublime-project
 __pycache__/
 Test_Private/
 Misc/
+test_hidden_files.py
+testSynchDirNews.cmd
