@@ -2,11 +2,15 @@ import os
 import sys
 import time
 from stat import *
+import stat
 import math
 import zlib
 import queue
 import shutil
 import threading
+import PySimpleGUI as sg
+from subprocess import check_output, CalledProcessError
+
 
 
 class file_pair:
@@ -49,14 +53,29 @@ class Synch:
 
         self.msg_queue.put((msg, f"{srcpath} to {dstpath}"))
 
-        # destination path must already exist
+        # Destination path must already exist
         if not os.path.exists(dest_folder):
             os.makedirs(dest_folder)
-
+            
+        # If hidden file
+        was_hidden = False
+        if self.has_hidden_attribute(srcpath):
+            was_hidden = True
+            self.show_file(srcpath)
+            self.show_file(dstpath)
+        
         try:
             shutil.copy2(srcpath, dstpath)
         except FileNotFoundError as e:
-            self.msg_queue.put(('ERROR', e))
+            self.msg_queue.put(('FileNotFoundError', e))
+        # This gets files when we try and copy descript.ion files
+        except PermissionError as e:
+            self.msg_queue.put(('PermissionError', e))
+            
+        # If was hidden file
+        #if was_hidden == True:
+            #self.hide_file(srcpath)
+            #self.hide_file(dstpath)
 
     def copy_over(self, relpath, filename):
         self.copy(relpath, filename, 'COPYOVER')
@@ -99,6 +118,38 @@ class Synch:
     def delete_if_folder_empty(self, foldername):
         if not os.listdir(foldername):
             os.rmdir(foldername)
+            
+    def has_hidden_attribute(self, filepath):
+        return bool(os.stat(filepath).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)    
+            
+    def hide_file(self, filepath):
+        if os.path.exists(filepath):
+            self.msg_queue.put(('HIDE', filepath))
+            hide_cmd = f'attrib +h {filepath}'
+            check_output(hide_cmd, shell = True)
+    
+    def show_file(self, filepath):
+        if os.path.exists(filepath):
+            self.msg_queue.put(('SHOW', filepath))
+            show_cmd = f'attrib -h {filepath}'
+            check_output(show_cmd, shell = True)
+    
+"""
+file_name = 'D:\\Backup\\e\\news\\descript.ion'
+
+dir_cmd = f'dir /b {file_name}'
+    
+dir_result = check_output(dir_cmd, shell = True).decode()
+print('dir', dir_result)
+
+try:
+    dir_result = check_output(dir_cmd, shell = True).decode()
+    print('dir\n', dir_result)
+except CalledProcessError as e:
+    pass
+
+"""
+            
 
 
 def convert_size(size_bytes):
@@ -137,7 +188,7 @@ def synchdir(msg_queue, srcdir, dstdir):
 
     synch = Synch(srcdir, dstdir, msg_queue)
 
-    # Collect, sStore and organize the data
+    # Collect, store and organize the data
     # 'files' is the root dictionary where we store everything
     # The keys 'filename' and 'relpath' are used for classifying and matching
     files = {}
@@ -220,7 +271,10 @@ class PrintHandlerThread(threading.Thread):
         while not self._stop_event.is_set():
             try:
                 record = self.msg_queue.get(True, 0.05)
-                print(record)
+                if record[0] == 'DONE':
+                    sg.Popup(record)
+                else:
+                    sg.Print(record)
             except queue.Empty:
                 continue
 
@@ -246,6 +300,8 @@ def main(argv, defaultSrc, defaultDst):
     msg_queue.put(('INFO', "Destination directory:", dstdir))
 
     synchdir(msg_queue, srcdir, dstdir)
+    msg_queue.put(('DONE - Autoclose in 15 sec.'))
+    time.sleep(15)
     printhandler.join()
 
 
