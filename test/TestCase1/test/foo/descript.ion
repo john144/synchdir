@@ -1,3 +1,28 @@
-Debug Debug
+StdAfx.cpp This goes in the main folder
+"One in Src Multiple in Dst.txt" This goes in the main folder
+CMyObject.cpp Changed by ACDSee
+test.java This goes in the main folder
+foo.rc This goes in the main folder
+readme This goes in the main folder
+foo.tlb This goes in the main folder
 SubFolder Sub Folder
+foops.mk This goes in the main folder
+CMyObject.rgs This goes in the main folder
+Debug Debug
+foops.def This goes in the main folder
+foo.dsw This goes in the main folder
+foo.cpp This goes in the main folder
+Resource.h This goes in the main folder
+README.MD This goes in the main folder
+"New HotFix.txt" This goes in the main folder
 XYZFolder XYZFolder
+foo_p.c This goes in the main folder
+AAA Changed by ACDSee
+foo.dsp This goes in the main folder
+foo.def This goes in the main folder
+CMyObject.h Changed by ACDSee
+foo_i.c This goes in the main folder
+foo.clw This goes in the main folder
+xyz.txt This goes in the main folder
+StdAfx.h This goes in the main folder
+dlldata.c This goes in the main folder
