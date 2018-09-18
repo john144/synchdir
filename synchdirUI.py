@@ -1,3 +1,4 @@
+import sys
 import queue
 import signal
 import threading
@@ -223,11 +224,20 @@ class App:
         self.root.destroy()
 
 
-def main():
+def main(argv):
+    global defaultSrc, defaultDst
+    try:
+        defaultSrc = argv[1]
+        defaultDst = argv[2]
+    except(IndexError):
+        pass
+
     root = tk.Tk()
     app = App(root)
     app.root.mainloop()
 
 
 if __name__ == '__main__':
-    main()
+    defaultSrc = "E:\\F_Drive\\projects\\foo"
+    defaultDst = "E:\\F_Drive\\projects\\foo1"
+    main(sys.argv)

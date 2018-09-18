@@ -240,6 +240,8 @@ def synchdir(msg_queue, srcdir, dstdir):
             if item.dst[key2].visited is False:
                 synch.delete(key2, key)
                 item.dst[key2].visited = True
+    msg_queue.put(('INFO', 'Done'))
+    
 
 
 class PrintHandlerThread(threading.Thread):
