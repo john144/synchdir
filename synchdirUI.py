@@ -9,8 +9,8 @@ from tkinter import filedialog
 import synchdir
 
 
-defaultSrc = "E:\\F_Drive\\projects\\foo"
-defaultDst = "E:\\F_Drive\\projects\\foo1"
+defaultSrc = "D:/Backup/e/news"
+defaultDst = "E:/Backup/e/news"
 
 msg_queue = queue.Queue()
 
